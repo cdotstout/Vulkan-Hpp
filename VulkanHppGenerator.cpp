@@ -1620,13 +1620,22 @@ void VulkanHppGenerator::readExtensionRequireType(tinyxml2::XMLElement const* el
         auto stit = m_structures.find(name);
         if (stit != m_structures.end())
         {
-          assert(m_handles.find(name) == m_handles.end());
+          //assert(m_handles.find(name) == m_handles.end());
           assert(stit->second.platform.empty());
           stit->second.platform = platform;
         }
         else
         {
-          assert((m_defines.find(name) != m_defines.end()));
+          auto hit = m_handles.find(name);
+          if (hit != m_handles.end())
+          {
+            assert(hit->second.platform.empty());
+            hit->second.platform = platform;
+          }
+          else
+          {
+            assert((m_defines.find(name) != m_defines.end()));
+          }
         }
       }
     }
@@ -3577,6 +3586,7 @@ ${commands}
   };
 )";
 
+      writePlatformEnter(os, handleData.second.platform);
       os << replaceWithMap(templateString, {
         { "className", stripPrefix(handleData.first, "Vk") },
         { "memberName", startLowerCase(stripPrefix(handleData.first, "Vk")) },
@@ -3587,6 +3597,7 @@ ${commands}
       {
         os << "  using " << stripPrefix(handleData.second.alias, "Vk") << " = " << stripPrefix(handleData.first, "Vk") << ";" << std::endl;
       }
+      writePlatformLeave(os, handleData.second.platform);
     }
   }
 }

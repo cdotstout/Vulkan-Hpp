@@ -132,6 +132,7 @@ class VulkanHppGenerator
       std::string                         deleteCommand;
       std::string                         deletePool;
       std::set<std::string>               childrenHandles;
+      std::string                         platform;
     };
 
     struct MemberData

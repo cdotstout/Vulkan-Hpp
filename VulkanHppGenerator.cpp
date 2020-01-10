@@ -4276,6 +4276,11 @@ void VulkanHppGenerator::writeUniqueTypes(std::ostream &os, std::string const& p
   template <typename Dispatch> class UniqueHandleTraits<${type}, Dispatch> { public: using deleter = ${deleterType}${deleterAction}<${deleterParent}${deleterPool}, Dispatch>; };
   using Unique${type} = UniqueHandle<${type}, DispatchLoaderDefault>;)";
 
+    if (!handleIt->second.platform.empty()) {
+      os << std::endl;
+    }
+    writePlatformEnter(os, handleIt->second.platform);
+
     os << replaceWithMap(uniqueTypesTemplate,
     {
       { "type", stripPrefix(childType, "Vk") },
@@ -4284,6 +4289,11 @@ void VulkanHppGenerator::writeUniqueTypes(std::ostream &os, std::string const& p
       { "deleterParent", parentType.empty() ? "NoParent" : stripPrefix(parentType, "Vk") },
       { "deleterPool", handleIt->second.deletePool.empty() ? "" : ", " + stripPrefix(handleIt->second.deletePool, "Vk") }
     });
+
+    if (!handleIt->second.platform.empty()) {
+      os << std::endl;
+    }
+    writePlatformLeave(os, handleIt->second.platform);
   }
   os << std::endl
     << "#endif /*VULKAN_HPP_NO_SMART_HANDLE*/" << std::endl;
